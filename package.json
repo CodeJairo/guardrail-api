@@ -2,6 +2,7 @@
   "name": "guardrail-api",
   "version": "1.0.0",
   "description": "API Security CLI for static OpenAPI analysis and dynamic security testing",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
