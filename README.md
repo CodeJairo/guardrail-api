@@ -13,14 +13,15 @@
 ## 🚀 Instalación y Requisitos
 
 - **Node.js**: v20 o superior.
+- **pnpm**: v9 o superior.
 
 ```bash
 # Instalar dependencias y compilar
-npm install
-npm run build
+pnpm install
+pnpm run build
 
 # Enlace global local (opcional)
-npm link
+pnpm link --global
 ```
 
 ---
@@ -34,8 +35,8 @@ Analiza el contrato OpenAPI local o remoto:
 # Usando binario compilado
 guardrail-api audit --spec ./swagger.json --static-only
 
-# O directamente con node / npm
-npm start -- audit --spec ./swagger.yaml --static-only
+# O directamente con pnpm start
+pnpm start -- audit --spec ./swagger.yaml --static-only
 ```
 
 ### 2. Auditoría Completa (Estática + Dinámica)
@@ -121,10 +122,15 @@ jobs:
         with:
           node-version: 22
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
       - name: Install dependencies & Build
         run: |
-          npm ci
-          npm run build
+          pnpm install --frozen-lockfile
+          pnpm run build
 
       - name: Run Guardrail API Security Audit
         run: |
@@ -146,5 +152,5 @@ jobs:
 
 ```bash
 # Ejecutar suite completa de tests unitarios y de integración con Vitest
-npm test
+pnpm test
 ```
