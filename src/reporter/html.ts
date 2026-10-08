@@ -18,6 +18,9 @@ export function generateHtmlReport(report: AuditReport): string {
     .map((f) => {
       const badgeClass = f.severity.toLowerCase();
       const loc = f.path ? `${f.method || ''} ${f.path}` : 'Specification Root';
+      const reproductionHtml = f.reproduction
+        ? `<div class="meta-row reproduction-row"><strong>cURL Reproduction:</strong> <code>${escapeHtml(f.reproduction)}</code></div>`
+        : '';
       const detailsHtml =
         f.details && Object.keys(f.details).length > 0
           ? `<pre class="details-pre"><code>${escapeHtml(JSON.stringify(f.details, null, 2))}</code></pre>`
@@ -38,6 +41,7 @@ export function generateHtmlReport(report: AuditReport): string {
             <strong>Remediation:</strong>
             <p>${escapeHtml(f.remediation)}</p>
           </div>
+          ${reproductionHtml}
           ${detailsHtml}
         </div>
       </div>

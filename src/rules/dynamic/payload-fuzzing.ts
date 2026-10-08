@@ -33,6 +33,7 @@ export const payloadFuzzingRule: DynamicRule = {
             });
 
             if (res.status === 500) {
+              const fullFuzzedUrl = `${context.targetUrl.replace(/\/+$/, '')}${fuzzedUrl}`;
               findings.push({
                 ruleId: 'DY-004',
                 title: 'Unhandled 500 Server Error on Invalid Path Parameter',
@@ -42,6 +43,7 @@ export const payloadFuzzingRule: DynamicRule = {
                 method: method.toUpperCase(),
                 message: `Sending invalid input '${fuzzValue}' for parameter '${p.name}' triggered HTTP 500 Internal Server Error instead of a controlled 400 Bad Request / 422 Unprocessable Entity.`,
                 remediation: `Implement input validation middleware on route '${path}' to reject malformed parameters with HTTP 400 Bad Request.`,
+                reproduction: `curl -i -X ${method.toUpperCase()} "${fullFuzzedUrl}"`,
                 details: { parameter: p.name, value: fuzzValue, statusCode: res.status },
               });
             }

@@ -41,6 +41,7 @@ export const unauthenticatedProbeRule: DynamicRule = {
             method,
             message: `Endpoint ${method} ${op.path} is documented to require authentication (${op.security?.map((s) => s.name).join(', ')}), but returned HTTP ${response.status} OK when accessed without credentials.`,
             remediation: 'Enforce authentication middleware on this route to ensure requests without valid tokens return HTTP 401 Unauthorized or 403 Forbidden.',
+            reproduction: `curl -i -X ${method} "${context.targetUrl.replace(/\/+$/, '')}${url}"`,
             details: {
               statusCode: response.status,
               securityRequirements: op.security,

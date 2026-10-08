@@ -49,8 +49,11 @@ guardrail-api audit \
   --fail-on high
 ```
 
-### 3. Exportar Reportes (JSON, Markdown, HTML)
+### 3. Exportar Reportes (JSON, Markdown, HTML, SARIF)
 ```bash
+# Reporte estándar SARIF para GitHub Code Scanning
+guardrail-api audit --spec ./swagger.json --format sarif --output results.sarif
+
 # Reporte interactivo HTML
 guardrail-api audit --spec ./swagger.json --output report.html
 
@@ -60,6 +63,34 @@ guardrail-api audit --spec ./swagger.json --format markdown --output report.md
 # Reporte JSON (para ingesta en SIEM o herramientas CI/CD)
 guardrail-api audit --spec ./swagger.json --format json --output report.json
 ```
+
+---
+
+## ⚙️ Archivo de Configuración (`.guardrailrc.json`)
+
+Puedes crear un archivo `.guardrailrc.json` en la raíz de tu proyecto para ignorar falsos positivos o endpoints intencionalmente públicos (como endpoints de health checks), establecer cabeceras fijas o personalizar umbrales:
+
+```json
+{
+  "failOn": "high",
+  "ignore": {
+    "endpoints": [
+      "/health",
+      "/metrics",
+      "/api/v1/ping"
+    ],
+    "rules": [
+      "ST-002"
+    ]
+  },
+  "customHeaders": {
+    "X-Internal-Audit": "true"
+  },
+  "timeout": 8000
+}
+```
+
+El CLI detecta automáticamente `.guardrailrc.json` en el directorio de trabajo, o puedes indicar una ruta con `--config <path>`.
 
 ---
 
@@ -138,12 +169,14 @@ jobs:
             --spec ./docs/openapi.yaml \
             --target https://staging-api.example.com \
             --fail-on critical \
-            --format markdown \
-            --output report.md
+            --format sarif \
+            --output results.sarif
 
-      - name: Publish Report in Job Summary
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
-        run: cat report.md >> $GITHUB_STEP_SUMMARY
+        with:
+          sarif_file: results.sarif
 ```
 
 ---

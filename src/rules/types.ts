@@ -20,6 +20,7 @@ export interface Finding {
   method?: string;
   message: string;
   remediation: string;
+  reproduction?: string;
   details?: Record<string, unknown>;
 }
 

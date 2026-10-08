@@ -83,6 +83,9 @@ export function printConsoleReport(report: AuditReport, failed: boolean, failThr
       console.log(`   ${pc.dim('Category:')}     ${finding.category}`);
       console.log(`   ${pc.dim('Description:')}  ${finding.message}`);
       console.log(`   ${pc.green('Remediation:')}  ${finding.remediation}`);
+      if (finding.reproduction) {
+        console.log(`   ${pc.yellow('cURL Replay:')}  ${pc.cyan(finding.reproduction)}`);
+      }
       if (finding.details && Object.keys(finding.details).length > 0) {
         console.log(`   ${pc.dim('Details:')}      ${JSON.stringify(finding.details)}`);
       }

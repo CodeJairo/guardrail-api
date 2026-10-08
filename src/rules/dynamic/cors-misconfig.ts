@@ -30,6 +30,9 @@ export const corsMisconfigRule: DynamicRule = {
       const acac = response.headers['access-control-allow-credentials'];
       const allowsCredentials = String(acac).toLowerCase() === 'true';
 
+      const baseUrlTrimmed = context.targetUrl.replace(/\/+$/, '');
+      const testUrl = `${baseUrlTrimmed}${testPath}`;
+
       if (acao) {
         const allowOriginStr = String(acao).trim();
 
@@ -44,6 +47,7 @@ export const corsMisconfigRule: DynamicRule = {
               path: testPath,
               message: `The server reflects arbitrary origins (${MALICIOUS_ORIGIN}) and allows credentials ('Access-Control-Allow-Credentials: true'). Attackers can read sensitive authenticated user data via CSRF-like JavaScript payloads.`,
               remediation: "Maintain a strict whitelist of trusted origins and never blindly reflect the incoming 'Origin' header when credentials are supported.",
+              reproduction: `curl -i -H "Origin: ${MALICIOUS_ORIGIN}" -X ${op?.method?.toUpperCase() || 'GET'} "${testUrl}"`,
               details: {
                 'Access-Control-Allow-Origin': allowOriginStr,
                 'Access-Control-Allow-Credentials': acac,
@@ -58,6 +62,7 @@ export const corsMisconfigRule: DynamicRule = {
               path: testPath,
               message: `The server reflects untrusted origin '${MALICIOUS_ORIGIN}' in 'Access-Control-Allow-Origin'.`,
               remediation: "Validate the 'Origin' request header against an explicit list of trusted domains before setting 'Access-Control-Allow-Origin'.",
+              reproduction: `curl -i -H "Origin: ${MALICIOUS_ORIGIN}" -X ${op?.method?.toUpperCase() || 'GET'} "${testUrl}"`,
               details: { 'Access-Control-Allow-Origin': allowOriginStr },
             });
           }

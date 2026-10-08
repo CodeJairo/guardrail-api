@@ -22,6 +22,9 @@ export const securityHeadersRule: DynamicRule = {
 
       const headers = response.headers;
 
+      const baseUrlTrimmed = context.targetUrl.replace(/\/+$/, '');
+      const testUrl = `${baseUrlTrimmed}${testPath}`;
+
       // 1. X-Content-Type-Options
       const xcto = headers['x-content-type-options'];
       if (!xcto || String(xcto).toLowerCase() !== 'nosniff') {
@@ -33,6 +36,7 @@ export const securityHeadersRule: DynamicRule = {
           path: testPath,
           message: "The response is missing 'X-Content-Type-Options: nosniff'. Browsers may attempt MIME-sniffing, leading to XSS vulnerabilities.",
           remediation: "Set 'X-Content-Type-Options: nosniff' header on all HTTP responses.",
+          reproduction: `curl -i -X GET "${testUrl}"`,
         });
       }
 
@@ -47,6 +51,7 @@ export const securityHeadersRule: DynamicRule = {
           path: testPath,
           message: "The response is missing 'Strict-Transport-Security'. Connections can be downgraded to unencrypted HTTP via MITM attacks.",
           remediation: "Add 'Strict-Transport-Security: max-age=31536000; includeSubDomains' header to enforce HTTPS.",
+          reproduction: `curl -i -X GET "${testUrl}"`,
         });
       }
 

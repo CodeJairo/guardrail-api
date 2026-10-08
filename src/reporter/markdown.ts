@@ -63,6 +63,9 @@ export function generateMarkdownReport(report: AuditReport): string {
     lines.push(`- **Location:** ${location}`);
     lines.push(`- **Description:** ${f.message}`);
     lines.push(`- **Remediation:** ${f.remediation}`);
+    if (f.reproduction) {
+      lines.push(`- **cURL Reproduction:** \`${f.reproduction}\``);
+    }
     if (f.details && Object.keys(f.details).length > 0) {
       lines.push(`- **Details:** \`${JSON.stringify(f.details)}\``);
     }
