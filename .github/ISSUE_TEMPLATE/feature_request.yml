@@ -1,0 +1,40 @@
+name: "✨ Feature / Rule Request"
+description: "Suggest an idea or propose a new security rule for Guardrail API"
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea or want to propose a new security check? We'd love to hear it!
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - "New Static Analysis Rule (OpenAPI Linting)"
+        - "New Dynamic DAST Probe"
+        - "CLI / Usability Improvement"
+        - "New Export Format / CI Integration"
+        - "Other"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Motivation
+      description: Is your feature request related to a specific vulnerability or use case?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution or Rule Logic
+      description: Describe how the rule or feature should work and what finding it should produce.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References / Standards
+      description: Links to OWASP API Security Top 10, CWE, CVE, or articles if applicable.

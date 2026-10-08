@@ -1,7 +1,12 @@
 # 🛡️ Guardrail API Security CLI
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node.js Version](https://img.shields.io/badge/Node.js-%3E%3D20-brightgreen.svg)](https://nodejs.org)
+[![CI](https://github.com/CodeJairo/guardrail-api/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeJairo/guardrail-api/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/guardrail-api.svg?color=blue)](https://www.npmjs.com/package/guardrail-api)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org)
+[![pnpm version](https://img.shields.io/badge/pnpm-%3E%3D9-orange.svg)](https://pnpm.io)
+[![SARIF 2.1.0](https://img.shields.io/badge/SARIF-2.1.0-purple.svg)](https://docs.github.com/en/code-security/code-scanning)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Guardrail API** es una herramienta de línea de comandos (CLI) diseñada para auditar la seguridad de APIs modernas mediante un enfoque híbrido:
 1. **Análisis Estático (OpenAPI Spec Linting)**: Inspecciona contratos OpenAPI/Swagger (JSON o YAML) en busca de esquemas de autenticación ausentes, validaciones débiles de tipos o parámetros, y endpoints críticos expuestos.

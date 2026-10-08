@@ -39,10 +39,20 @@
     "cli",
     "dast",
     "sast",
-    "linter"
+    "linter",
+    "sarif",
+    "owasp"
   ],
-  "author": "",
+  "author": "CodeJairo",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodeJairo/guardrail-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CodeJairo/guardrail-api/issues"
+  },
+  "homepage": "https://github.com/CodeJairo/guardrail-api#readme",
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.1.1",
     "axios": "^1.7.9",

@@ -1,0 +1,48 @@
+name: "🐛 Bug Report"
+description: "Report a bug or unexpected behavior in Guardrail API"
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Please provide as much detail as possible.
+  - type: input
+    id: version
+    attributes:
+      label: Guardrail API Version
+      description: What version of guardrail-api are you running? (e.g. 1.0.0)
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Node.js & OS Environment
+      description: What version of Node.js and operating system? (e.g. Node 22 on Linux x64)
+      placeholder: "Node v22.13.0 on Linux Ubuntu 24.04"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps or commands to reproduce the issue.
+      placeholder: |
+        1. Run `guardrail-api audit --spec ./my-spec.yaml`
+        2. Notice error...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs or Terminal Output
+      description: Copy and paste the full command output or stack trace.
+      render: shell
