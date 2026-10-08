@@ -18,7 +18,7 @@ export function createAuditCommand(): Command {
     )
     .option(
       '-f, --format <format>',
-      'Output format (console, json, markdown, html)',
+      'Output format (console, json, markdown, html, sarif)',
       'console'
     )
     .option('-o, --output <path>', 'Output file path to save report')
@@ -39,7 +39,7 @@ export function createAuditCommand(): Command {
           process.exit(1);
         }
 
-        const validFormats: ReportFormat[] = ['console', 'json', 'markdown', 'html'];
+        const validFormats: ReportFormat[] = ['console', 'json', 'markdown', 'html', 'sarif'];
         const format = options.format.toLowerCase() as ReportFormat;
         if (!validFormats.includes(format)) {
           console.error(

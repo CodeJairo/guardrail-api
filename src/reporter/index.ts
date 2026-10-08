@@ -6,8 +6,9 @@ import { printConsoleReport } from './console.js';
 import { generateJsonReport } from './json.js';
 import { generateMarkdownReport } from './markdown.js';
 import { generateHtmlReport } from './html.js';
+import { generateSarifReport } from './sarif.js';
 
-export type ReportFormat = 'console' | 'json' | 'markdown' | 'html';
+export type ReportFormat = 'console' | 'json' | 'markdown' | 'html' | 'sarif';
 
 export interface ReporterOptions {
   format?: ReportFormat;
@@ -39,6 +40,9 @@ export function handleReportOutput(
     case 'html':
       content = generateHtmlReport(report);
       break;
+    case 'sarif':
+      content = generateSarifReport(report);
+      break;
     case 'console':
     default:
       printConsoleReport(report, failed, failThreshold);
@@ -51,13 +55,15 @@ export function handleReportOutput(
       ? outputPath
       : path.resolve(process.cwd(), outputPath);
 
-    // If format was console but output file was requested, save JSON by default if no extension or matching content
+    // If format was console but output file was requested, save appropriate format
     let finalContent = content;
     if (format === 'console') {
       if (outputPath.endsWith('.html')) {
         finalContent = generateHtmlReport(report);
       } else if (outputPath.endsWith('.md')) {
         finalContent = generateMarkdownReport(report);
+      } else if (outputPath.endsWith('.sarif')) {
+        finalContent = generateSarifReport(report);
       } else {
         finalContent = generateJsonReport(report);
       }
@@ -76,3 +82,4 @@ export * from './console.js';
 export * from './json.js';
 export * from './markdown.js';
 export * from './html.js';
+export * from './sarif.js';
