@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import pc from 'picocolors';
 import { runAudit, shouldFailAudit } from '../../engine/runner.js';
 import { handleReportOutput, type ReportFormat } from '../../reporter/index.js';
+import { loadConfig } from '../../config/loader.js';
 import type { Severity } from '../../rules/types.js';
 
 export function createAuditCommand(): Command {
@@ -9,12 +10,12 @@ export function createAuditCommand(): Command {
     .description('Audit OpenAPI specification and target API for security vulnerabilities')
     .requiredOption('-s, --spec <pathOrUrl>', 'Path or URL to OpenAPI/Swagger specification (JSON or YAML)')
     .option('-t, --target <url>', 'Base URL of running API for dynamic testing')
+    .option('-c, --config <path>', 'Path to .guardrailrc.json configuration file')
     .option('--static-only', 'Run only static specification analysis', false)
     .option('--dynamic-only', 'Run only dynamic API security testing', false)
     .option(
       '--fail-on <severity>',
-      'Minimum severity level to trigger exit code 1 (critical, high, medium, low, info)',
-      'critical'
+      'Minimum severity level to trigger exit code 1 (critical, high, medium, low, info)'
     )
     .option(
       '-f, --format <format>',
@@ -29,12 +30,15 @@ export function createAuditCommand(): Command {
     )
     .action(async (options) => {
       try {
-        const failThreshold = options.failOn.toUpperCase() as Severity;
+        const config = loadConfig(options.config);
+
+        const rawFailOn = options.failOn || config?.failOn || 'critical';
+        const failThreshold = rawFailOn.toUpperCase() as Severity;
         const validSeverities: Severity[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO'];
 
         if (!validSeverities.includes(failThreshold)) {
           console.error(
-            pc.red(`Error: Invalid --fail-on severity '${options.failOn}'. Must be one of: ${validSeverities.join(', ')}`)
+            pc.red(`Error: Invalid --fail-on severity '${rawFailOn}'. Must be one of: ${validSeverities.join(', ')}`)
           );
           process.exit(1);
         }
@@ -70,8 +74,9 @@ export function createAuditCommand(): Command {
           targetUrl: options.target,
           staticOnly: Boolean(options.staticOnly),
           dynamicOnly: Boolean(options.dynamicOnly),
-          timeout: parseInt(options.timeout, 10) || 5000,
+          timeout: options.timeout ? parseInt(options.timeout, 10) : undefined,
           customHeaders,
+          config: config || undefined,
         });
 
         const failed = shouldFailAudit(report.summary, failThreshold);

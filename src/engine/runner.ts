@@ -2,6 +2,7 @@ import { parseAndNormalizeSpec } from '../parser/index.js';
 import { createHttpClient } from './http-client.js';
 import { getDynamicRules, getStaticRules } from '../rules/registry.js';
 import type { Finding, Severity } from '../rules/types.js';
+import type { GuardrailConfig } from '../config/loader.js';
 
 export interface AuditOptions {
   specPathOrUrl: string;
@@ -10,6 +11,7 @@ export interface AuditOptions {
   dynamicOnly?: boolean;
   timeout?: number;
   customHeaders?: Record<string, string>;
+  config?: GuardrailConfig;
 }
 
 export interface AuditSummary {
@@ -67,12 +69,18 @@ export async function runAudit(options: AuditOptions): Promise<AuditReport> {
   }
 
   // 3. Dynamic Analysis
-  const targetUrl = options.targetUrl || spec.servers[0];
+  const mergedHeaders = {
+    ...options.config?.customHeaders,
+    ...options.customHeaders,
+  };
+  const effectiveTimeout = options.timeout ?? options.config?.timeout ?? 5000;
+  const targetUrl = options.targetUrl ?? options.config?.targetUrl ?? spec.servers[0];
+
   if (!options.staticOnly && targetUrl) {
     const client = createHttpClient({
       baseUrl: targetUrl,
-      timeout: options.timeout,
-      customHeaders: options.customHeaders,
+      timeout: effectiveTimeout,
+      customHeaders: mergedHeaders,
     });
 
     const dynamicRules = getDynamicRules();
@@ -82,8 +90,8 @@ export async function runAudit(options: AuditOptions): Promise<AuditReport> {
           spec,
           targetUrl,
           client,
-          customHeaders: options.customHeaders,
-          timeout: options.timeout,
+          customHeaders: mergedHeaders,
+          timeout: effectiveTimeout,
         });
         findings.push(...ruleFindings);
       } catch (err: any) {
@@ -99,14 +107,28 @@ export async function runAudit(options: AuditOptions): Promise<AuditReport> {
     }
   }
 
+  // Filter out findings suppressed by config
+  const ignoredRules = new Set(options.config?.ignore?.rules || []);
+  const ignoredEndpoints = options.config?.ignore?.endpoints || [];
+
+  const activeFindings = findings.filter((f) => {
+    if (ignoredRules.has(f.ruleId)) {
+      return false;
+    }
+    if (f.path && ignoredEndpoints.some((pattern) => f.path === pattern || f.path?.startsWith(pattern))) {
+      return false;
+    }
+    return true;
+  });
+
   // 4. Calculate summary metrics
   const summary: AuditSummary = {
-    critical: findings.filter((f) => f.severity === 'CRITICAL').length,
-    high: findings.filter((f) => f.severity === 'HIGH').length,
-    medium: findings.filter((f) => f.severity === 'MEDIUM').length,
-    low: findings.filter((f) => f.severity === 'LOW').length,
-    info: findings.filter((f) => f.severity === 'INFO').length,
-    total: findings.length,
+    critical: activeFindings.filter((f) => f.severity === 'CRITICAL').length,
+    high: activeFindings.filter((f) => f.severity === 'HIGH').length,
+    medium: activeFindings.filter((f) => f.severity === 'MEDIUM').length,
+    low: activeFindings.filter((f) => f.severity === 'LOW').length,
+    info: activeFindings.filter((f) => f.severity === 'INFO').length,
+    total: activeFindings.length,
   };
 
   const endTime = Date.now();
@@ -120,7 +142,7 @@ export async function runAudit(options: AuditOptions): Promise<AuditReport> {
     endTime: new Date().toISOString(),
     durationMs: endTime - startTime,
     totalOperations: spec.operations.length,
-    findings,
+    findings: activeFindings,
     summary,
   };
 }
