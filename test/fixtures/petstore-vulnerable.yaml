@@ -1,0 +1,18 @@
+openapi: 3.0.3
+info:
+  title: Vulnerable Demo Petstore API (YAML)
+  version: 1.0.0
+  description: YAML version of the test specification
+servers:
+  - url: http://localhost:4000/api/v1
+paths:
+  /pets:
+    get:
+      summary: List pets
+      parameters:
+        - name: limit
+          in: query
+          required: false
+      responses:
+        '200':
+          description: OK
